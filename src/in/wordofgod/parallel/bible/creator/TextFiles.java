@@ -24,6 +24,7 @@ import in.wordofgod.bible.parser.vosgson.Verse;
 public class TextFiles {
 
 	private static Map<String, Bible> biblesMap = new HashMap<String, Bible>();
+	private static Map<String, String> versionToAbbrMap = new HashMap<String, String>();
 	private static Map<String, Book> booksMap = new HashMap<String, Book>();
 	private static Map<String, Chapter> chaptersMap = new HashMap<String, Chapter>();
 	private static Map<String, Verse> versesMap = new HashMap<String, Verse>();
@@ -116,6 +117,7 @@ public class TextFiles {
 				bible = TheWord.getBible(file.getAbsolutePath(), bibleInformationPath + "-information.ini");
 				version = stripExtension(version);
 				biblesMap.put(version, bible);
+				versionToAbbrMap.put(version, bible.getAbbr());
 				buildBooksMap(version, bible);
 			} catch (FileNotFoundException e) {
 				System.out.println(
@@ -186,11 +188,16 @@ public class TextFiles {
 	}
 
 	private static void generateTextForWholeBible(boolean filesByDirectory) {
-		for (String version : biblesMap.keySet()) {
-			Bible bible = biblesMap.get(version);
-			if (bible.getBooks().size() > 27) {
-				bibleForNavigation = bible;
-				break;
+		Bible bible = biblesMap.get(ParallelBibleCreator.bibleVersionForBookNames);
+		if (bible != null && bible.getBooks().size() > 27) {
+			bibleForNavigation = bible;
+		} else {
+			for (String version : biblesMap.keySet()) {
+				bible = biblesMap.get(version);
+				if (bible.getBooks().size() > 27) {
+					bibleForNavigation = bible;
+					break;
+				}
 			}
 		}
 		if (bibleForNavigation == null) {
@@ -213,9 +220,10 @@ public class TextFiles {
 										chapterForNavigation.getChapter(), verseForNavigation.getNumber()));
 						if (verse != null) {
 							String verseText = removeHTMLTags(verse.getText());
-							sb.append(version).append(" ").append(verseText).append("\n");
+							sb.append(versionToAbbrMap.get(version)).append(" ").append(verseText).append("\n");
 						}
 					}
+					sb.append("\n");
 				}
 				if (filesByDirectory) {
 					String filePath = ParallelBibleCreator.outputDirectory + "/" + bookDir + "/"
@@ -268,11 +276,20 @@ public class TextFiles {
 	}
 
 	private static String removeHTMLTags(String text) {
+		if (ParallelBibleCreator.keepStrongNumbers) {
+			text = text.replaceAll("<(S%H[0-9]+)>", "@$1#");
+			text = text.replaceAll("<(S%G[0-9]+)>", "@$1#");
+			text = text.replaceAll("<(s%)>", "@$1#");
+		}
 		while (text.contains("<")) {
 			int startPos = text.indexOf("<");
 			int endPos = text.indexOf(">");
 			String htmlTag = text.substring(startPos, endPos + 1);
 			text = text.replace(htmlTag, "");
+		}
+		if (ParallelBibleCreator.keepStrongNumbers) {
+			text = text.replaceAll("@", "<");
+			text = text.replaceAll("#", ">");
 		}
 		return text;
 	}

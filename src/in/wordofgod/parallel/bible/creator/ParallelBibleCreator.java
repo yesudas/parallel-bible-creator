@@ -24,9 +24,11 @@ public class ParallelBibleCreator {
 	public static String outputFormat;
 	public static String useLongBookName;
 	public static String[] bibleVersions;
+	public static String bibleVersionForBookNames;
 	public static String bibleSourceDirectory;
 	public static String outputDirectory;
 	public static String biblePortions;
+	public static boolean keepStrongNumbers = false;
 
 	/**
 	 * @param args
@@ -82,7 +84,14 @@ public class ParallelBibleCreator {
 			}
 			outputFormat = INFORMATION.getProperty("outputFormat");
 			useLongBookName = INFORMATION.getProperty("useLongBookName");
+			if ("yes".equalsIgnoreCase(INFORMATION.getProperty("keepStrongNumbers"))) {
+				keepStrongNumbers = true;
+			}
 			bibleVersions = INFORMATION.getProperty("bibleVersions").split(",");
+			bibleVersionForBookNames = INFORMATION.getProperty("bibleVersionForBookNames");
+			if (bibleVersionForBookNames == null || "".equals(bibleVersionForBookNames)) {
+				bibleVersionForBookNames = bibleVersions[0];
+			}
 			bibleSourceDirectory = INFORMATION.getProperty("bibleSourceDirectory");
 			outputDirectory = INFORMATION.getProperty("outputDirectory");
 			biblePortions = INFORMATION.getProperty("biblePortions");
@@ -98,26 +107,28 @@ public class ParallelBibleCreator {
 		System.out.println(
 				"Sample INFORMATION.ini file is present in the downloaded program or at https://github.com/yesudas/parallel-bible-creator");
 		System.out.println("Or INFORMATION.ini file can be prepared with the below tips:");
+		System.out
+				.println("outputFormat => supported outputFormats are TextFiles, TextFilesByDirectory, SingleTextFile");
+		System.out.println("useLongBookName => supported values are yes, no");
 		System.out.println(
-				"Please use \\\\ or / in INFORMATION.ini file for bibleSourceDirectory as well as outputDirectory instead of just single \\");
+				"bibleVersions => Use comma separated listed of all bible versions, mention extension as well. Ex. TBSI.ont,KJV+.ont,BBE.nt");
 		System.out.println(
-				"# outputFormat => supported outputFormats are TextFiles, TextFilesByDirectory, SingleTextFile");
-		System.out.println("# useLongBookName => supported values are yes, no");
+				"You can download bibles from https://github.com/yesudas/all-bible-databases/tree/main/Bibles/TheWord-Bible-Databases");
 		System.out.println(
-				"# bibleVersions => Use comma separated listed of all bible versions, mention extension as well. Ex. TBSI.ont,KJV+.ont,BBE.nt");
+				"Download both *-information.ini files as well as bible text files in the format *.ont or *.nt");
 		System.out.println(
-				"# You can download bibles from https://github.com/yesudas/all-bible-databases/tree/main/Bibles/TheWord-Bible-Databases");
+				"bibleVersionForBookNames => Optional value, Mention which bible version should be considered for displaying the book names");
 		System.out.println(
-				"# Download both *-information.ini files as well as bible text files in the format *.ont or *.nt");
+				"bibleSourcePath => give the full directory path where the bible text & corresponding *-information.ini files are stored");
+		System.out.println("Use \\\\ or / in instead of just single \\ in the file path");
+		System.out.println("outputPath => give the full directory path where the results should be stored");
+		System.out.println("Use \\\\ or / in instead of just single \\ in the file path");
 		System.out.println(
-				"# bibleSourcePath => give the full directory path where the bible text & corresponding *-information.ini files are stored");
-		System.out.println("# outputPath => give the full directory path where the results should be stored");
+				"biblePortions => Keep empty for full bible, otherwise specify as show in the examples. Example 1: biblePortions=Gen 1,2,3,5 (denotes chapters 1,2,3 & 5 from genesis). Example 2: biblePortions=Gen 12:2,3,4 (denotes genesis chapter 12 and verses 2,3 &4). Example 3: biblePortions=Gen 10:1-20 (denotes genesis chapter 10 and verses from 1 to 20)");
 		System.out.println(
-				"# biblePortions => Keep empty for full bible, otherwise specify as show in the examples. Example 1: biblePortions=Gen 1,2,3,5 (denotes chapters 1,2,3 & 5 from genesis). Example 2: biblePortions=Gen 12:2,3,4 (denotes genesis chapter 12 and verses 2,3 &4). Example 3: biblePortions=Gen 10:1-20 (denotes genesis chapter 10 and verses from 1 to 20)");
+				"You can give more than one bible portion separated by comma. Example: biblePortions=Gen 1:1-5; Mat 5:1-10 (denotes genesis chapter 1 and verses from 1 to 5 as well as matthew chapter 5 and verses from 1 to 10)");
 		System.out.println(
-				"# You can give more than one bible portion separated by comma. Example: biblePortions=Gen 1:1-5; Mat 5:1-10 (denotes genesis chapter 1 and verses from 1 to 5 as well as matthew chapter 5 and verses from 1 to 10)");
-		System.out.println(
-				"# Name of the books should be this from this list only: Gen, Exo, Lev, Num, Deu, Jos, Jdg, Rth, 1Sa, 2Sa, 1Ki, 2Ki, 1Ch, 2Ch, Ezr, Neh, Est, Job, Psa, Pro, Ecc, Son, Isa, Jer, Lam, Eze, Dan, Hos, Joe, Amo, Oba, Jon, Mic, Nah, Hab, Zep, Hag, Zec, Mal, Mat, Mar, Luk, Joh, Act, Rom, 1Co, 2Co, Gal, Eph, Php, Col, 1Th, 2Th, 1Ti, 2Ti, Tit, Phm, Heb, Jas, 1Pe, 2Pe, 1Jn, 2Jn, 3Jn, Jud, Rev");
+				"Name of the books should be this from this list only: Gen, Exo, Lev, Num, Deu, Jos, Jdg, Rth, 1Sa, 2Sa, 1Ki, 2Ki, 1Ch, 2Ch, Ezr, Neh, Est, Job, Psa, Pro, Ecc, Son, Isa, Jer, Lam, Eze, Dan, Hos, Joe, Amo, Oba, Jon, Mic, Nah, Hab, Zep, Hag, Zec, Mal, Mat, Mar, Luk, Joh, Act, Rom, 1Co, 2Co, Gal, Eph, Php, Col, 1Th, 2Th, 1Ti, 2Ti, Tit, Phm, Heb, Jas, 1Pe, 2Pe, 1Jn, 2Jn, 3Jn, Jud, Rev");
 	}
 
 	private static void loadInformation(String informationFilePath) {
