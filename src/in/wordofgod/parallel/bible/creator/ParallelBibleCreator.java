@@ -47,7 +47,7 @@ public class ParallelBibleCreator {
 			break;
 
 		case Constants.FORMAT_TEXTFILES_BY_DIRECTORY:
-			TextFiles.createSingleTextFile();
+			TextFiles.createTextFilesByDirectory();
 			break;
 
 		case Constants.FORMAT_JSON:

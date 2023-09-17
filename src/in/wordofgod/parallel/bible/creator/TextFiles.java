@@ -30,6 +30,25 @@ public class TextFiles {
 	private static Bible bibleForNavigation = null;
 
 	public static void createSingleTextFile() {
+		System.out.println("SingleTextFile Creation Started...");
+		System.out.println("Bibles loading started...");
+
+		buildBiblesMap();
+
+		if (!biblesMap.isEmpty()) {
+			System.out.println("Bibles loaded successfully...");
+		}
+
+		if (!"".equals(ParallelBibleCreator.biblePortions)) {
+			generateTextByBiblePortions();
+		} else {
+			generateTextForWholeBible(false);
+		}
+
+		System.out.println("Results are saved in the directory: " + ParallelBibleCreator.outputDirectory);
+	}
+
+	public static void createTextFilesByDirectory() {
 		System.out.println("TextFilesByDirectory Creation Started...");
 		System.out.println("Bibles loading started...");
 
@@ -42,7 +61,7 @@ public class TextFiles {
 		if (!"".equals(ParallelBibleCreator.biblePortions)) {
 			generateTextByBiblePortions();
 		} else {
-			generateTextForWholeBible();
+			generateTextForWholeBible(true);
 		}
 
 		System.out.println("Results are saved in the directory: " + ParallelBibleCreator.outputDirectory);
@@ -166,7 +185,7 @@ public class TextFiles {
 
 	}
 
-	private static void generateTextForWholeBible() {
+	private static void generateTextForWholeBible(boolean filesByDirectory) {
 		for (String version : biblesMap.keySet()) {
 			Bible bible = biblesMap.get(version);
 			if (bible.getBooks().size() > 27) {
@@ -179,6 +198,11 @@ public class TextFiles {
 		}
 		StringBuilder sb = new StringBuilder();
 		for (Book bookForNavigation : bibleForNavigation.getBooks()) {
+			String bookDir = null;
+			if (filesByDirectory) {
+				bookDir = getBookNo(bookForNavigation.getBookNo()) + " " + bookForNavigation.getLongName();
+				createDir(bookDir);
+			}
 			for (Chapter chapterForNavigation : bookForNavigation.getChapters()) {
 				for (Verse verseForNavigation : chapterForNavigation.getVerses()) {
 					sb.append(bookForNavigation.getEnglishName()).append(" ").append(chapterForNavigation.getChapter())
@@ -193,9 +217,18 @@ public class TextFiles {
 						}
 					}
 				}
+				if (filesByDirectory) {
+					String filePath = ParallelBibleCreator.outputDirectory + "/" + bookDir + "/"
+							+ getChapterNo(bookForNavigation.getBookNo(), chapterForNavigation.getChapter()) + ".txt";
+					createFile(filePath, sb.toString());
+					sb = new StringBuilder();
+				}
 			}
 		}
-		createFile(ParallelBibleCreator.outputDirectory, sb.toString());
+		if (!filesByDirectory) {
+			createDir(ParallelBibleCreator.outputDirectory);
+			createFile(ParallelBibleCreator.outputDirectory + "/" + "Parallel-Bible.txt", sb.toString());
+		}
 	}
 
 	private static void createDir(String dirPath) {
@@ -209,12 +242,6 @@ public class TextFiles {
 	}
 
 	private static void createFile(String filePath, String text) {
-		File file = new File(ParallelBibleCreator.outputDirectory);
-		if (file.isDirectory()) {
-			filePath = filePath + "/" + "Parallel-Bible.txt";
-			file = new File(filePath);
-			file.delete();
-		}
 		try {
 			Files.writeString(Path.of(filePath), text);
 			System.out.println("Created the file: " + filePath);
