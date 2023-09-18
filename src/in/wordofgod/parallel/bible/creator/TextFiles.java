@@ -114,6 +114,7 @@ public class TextFiles {
 			File file = new File(biblePath);
 			Bible bible;
 			try {
+				System.out.println("Loading the version: " + version);
 				bible = TheWord.getBible(file.getAbsolutePath(), bibleInformationPath + "-information.ini");
 				version = stripExtension(version);
 				biblesMap.put(version, bible);
@@ -219,7 +220,7 @@ public class TextFiles {
 								.get(generateKeyforVerseMap(version, bookForNavigation.getThreeLetterCode(),
 										chapterForNavigation.getChapter(), verseForNavigation.getNumber()));
 						if (verse != null) {
-							String verseText = removeHTMLTags(verse.getText());
+							String verseText = removeHTMLTags(verse.getUnParsedText());
 							sb.append(versionToAbbrMap.get(version)).append(" ").append(verseText).append("\n");
 						}
 					}
@@ -277,9 +278,8 @@ public class TextFiles {
 
 	private static String removeHTMLTags(String text) {
 		if (ParallelBibleCreator.keepStrongNumbers) {
-			text = text.replaceAll("<(S%H[0-9]+)>", "@$1#");
-			text = text.replaceAll("<(S%G[0-9]+)>", "@$1#");
-			text = text.replaceAll("<(s%)>", "@$1#");
+			text = text.replaceAll("<(WH[0-9]+)>", "@$1#");
+			text = text.replaceAll("<(WG[0-9]+)>", "@$1#");
 		}
 		while (text.contains("<")) {
 			int startPos = text.indexOf("<");
