@@ -138,13 +138,18 @@ public class TextFiles {
 	}
 
 	public static void generateTextByBiblePortions() {
+		System.out.println("Generating parallel bible Text By BiblePortions started...");
+		System.out.println("Given biblePortions: " + ParallelBibleCreator.biblePortions);
+		initBibleForNavigation();
+		StringBuilder sb = new StringBuilder();
 		String[] portions = ParallelBibleCreator.biblePortions.trim().split(";");
 		for (String portion : portions) {
+			sb.append(portion).append("\n");
 			if (!portion.contains(":")) {// Gen 1,2,3,5;
 				String[] portionArr = portion.trim().split(" ");
 				String bookName = portionArr[0];
 				String[] chapterArray = portionArr[1].trim().split(",");
-				buildListOfVerses(bookName, chapterArray, null);
+				buildListOfVersesByChapters(sb, bookName, chapterArray);
 			} else if (portion.contains("-")) {// Gen 10:1-20;
 				String[] portionArr = portion.trim().split(" ");
 				String bookName = portionArr[0];
@@ -155,16 +160,14 @@ public class TextFiles {
 				int fromVerseNo = Integer.parseInt(versesArray[0]);
 				if (versesArray.length > 1) {
 					int toVerseNo = Integer.parseInt(versesArray[1]);
-					String[] verseList = new String[toVerseNo - fromVerseNo + 1];
+					String[] verseArray = new String[toVerseNo - fromVerseNo + 1];
 					for (int i = fromVerseNo; i <= toVerseNo; i++) {
-						verseList[i] = "" + i;
+						verseArray[i - 1] = "" + i;
 					}
-					String[] chapterArray = { "" + chapterNo };
-					buildListOfVerses(bookName, chapterArray, verseList);
+					buildListOfVerses(sb, bookName, "" + chapterNo, verseArray);
 				} else {
-					String[] verseList = { "" + fromVerseNo };
-					String[] chapterArray = { "" + chapterNo };
-					buildListOfVerses(bookName, chapterArray, verseList);
+					String[] verseArray = { "" + fromVerseNo };
+					buildListOfVerses(sb, bookName, "" + chapterNo, verseArray);
 				}
 			} else {// Gen 12:2,3,4;
 				String[] portionArr = portion.split(" ");
@@ -173,37 +176,56 @@ public class TextFiles {
 				int chapterNo = Integer.parseInt(chapterAndVersesArray[0]);
 				if (chapterAndVersesArray.length > 1) {
 					String verses = chapterAndVersesArray[1];
-					String[] verseList = verses.split(",");
-					String[] chapterArray = { "" + chapterNo };
-					buildListOfVerses(bookName, chapterArray, verseList);
+					String[] verseArray = verses.split(",");
+					buildListOfVerses(sb, bookName, "" + chapterNo, verseArray);
 				}
 			}
-
 		}
-
+		System.out.println("Generating parallel bible Text By BiblePortions completed...");
+		createDir(ParallelBibleCreator.outputDirectory);
+		createFile(ParallelBibleCreator.outputDirectory + "/" + "Parallel-Bible.txt", sb.toString());
 	}
 
-	private static void buildListOfVerses(String bookName, String[] chapterArray, String[] verseList) {
-		// TODO Auto-generated method stub
+	// Gen 1,2,3,5;
+	private static void buildListOfVersesByChapters(StringBuilder sb, String bookName, String[] chapterArray) {
+		String randomVersion = biblesMap.entrySet().iterator().next().getKey();
+		for (String chapter : chapterArray) {
+			sb.append(bookName).append(" ").append(chapter).append("\n");
+			Chapter chapterForNavigation = chaptersMap.get(generateKeyforChaptersMap(randomVersion, bookName, chapter));
+			for (Verse verseForNavigation : chapterForNavigation.getVerses()) {
+				sb.append(bookName).append(" ").append(chapterForNavigation.getChapter()).append(":")
+						.append(verseForNavigation.getNumber()).append("\n");
+				for (String version : biblesMap.keySet()) {
+					Verse verse = versesMap.get(generateKeyforVerseMap(version, bookName,
+							chapterForNavigation.getChapter(), verseForNavigation.getNumber()));
+					if (verse != null) {
+						String verseText = removeHTMLTags(verse.getUnParsedText());
+						sb.append(versionToAbbrMap.get(version)).append(" ").append(verseText).append("\n");
+					}
+				}
+			}
+			sb.append("\n\n");
+		}
+		sb.append("\n\n");
+	}
 
+	// Gen 12:2,3,4; or // Gen 10:1-20;
+	private static void buildListOfVerses(StringBuilder sb, String bookName, String chapterNo, String[] verseArray) {
+		for (String verseNo : verseArray) {
+			sb.append(bookName).append(" ").append(chapterNo).append(":").append(verseNo).append("\n");
+			for (String version : biblesMap.keySet()) {
+				Verse verse = versesMap.get(generateKeyforVerseMap(version, bookName, chapterNo, verseNo));
+				if (verse != null) {
+					String verseText = removeHTMLTags(verse.getUnParsedText());
+					sb.append(versionToAbbrMap.get(version)).append(" ").append(verseText).append("\n");
+				}
+			}
+		}
+		sb.append("\n\n");
 	}
 
 	private static void generateTextForWholeBible(boolean filesByDirectory) {
-		Bible bible = biblesMap.get(ParallelBibleCreator.bibleVersionForBookNames);
-		if (bible != null && bible.getBooks().size() > 27) {
-			bibleForNavigation = bible;
-		} else {
-			for (String version : biblesMap.keySet()) {
-				bible = biblesMap.get(version);
-				if (bible.getBooks().size() > 27) {
-					bibleForNavigation = bible;
-					break;
-				}
-			}
-		}
-		if (bibleForNavigation == null) {
-			bibleForNavigation = biblesMap.get(stripExtension(ParallelBibleCreator.bibleVersions[0]));
-		}
+		initBibleForNavigation();
 		StringBuilder sb = new StringBuilder();
 		for (Book bookForNavigation : bibleForNavigation.getBooks()) {
 			String bookDir = null;
@@ -237,6 +259,27 @@ public class TextFiles {
 		if (!filesByDirectory) {
 			createDir(ParallelBibleCreator.outputDirectory);
 			createFile(ParallelBibleCreator.outputDirectory + "/" + "Parallel-Bible.txt", sb.toString());
+		}
+	}
+
+	private static void initBibleForNavigation() {
+		if (bibleForNavigation != null) {
+			return;
+		}
+		Bible bible = biblesMap.get(ParallelBibleCreator.bibleVersionForBookNames);
+		if (bible != null && bible.getBooks().size() > 27) {
+			bibleForNavigation = bible;
+		} else {
+			for (String version : biblesMap.keySet()) {
+				bible = biblesMap.get(version);
+				if (bible.getBooks().size() > 27) {
+					bibleForNavigation = bible;
+					break;
+				}
+			}
+		}
+		if (bibleForNavigation == null) {
+			bibleForNavigation = biblesMap.get(stripExtension(ParallelBibleCreator.bibleVersions[0]));
 		}
 	}
 
@@ -291,7 +334,7 @@ public class TextFiles {
 			text = text.replaceAll("@", "<");
 			text = text.replaceAll("#", ">");
 		}
-		return text;
+		return text.replaceAll("&nbsp;", "");
 	}
 
 }
