@@ -143,7 +143,7 @@ public class TextFiles {
 		initBibleForNavigation();
 		StringBuilder sb = new StringBuilder();
 		String[] portions = ParallelBibleCreator.biblePortions.trim().split(";");
-		for (String portion : portions) {
+		for (String portion : portions) {//TODO அப். 6:5, 8-15
 			sb.append(portion).append("\n");
 			if (!portion.contains(":")) {// Gen 1,2,3,5;
 				String[] portionArr = portion.trim().split(" ");
