@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import in.wordofgod.bible.parser.Bible;
@@ -23,7 +24,7 @@ import in.wordofgod.bible.parser.vosgson.Verse;
  */
 public class TextFiles {
 
-	private static Map<String, Bible> biblesMap = new HashMap<String, Bible>();
+	private static Map<String, Bible> biblesMap = new LinkedHashMap<String, Bible>();
 	private static Map<String, String> versionToAbbrMap = new HashMap<String, String>();
 	private static Map<String, Book> booksMap = new HashMap<String, Book>();
 	private static Map<String, Chapter> chaptersMap = new HashMap<String, Chapter>();
