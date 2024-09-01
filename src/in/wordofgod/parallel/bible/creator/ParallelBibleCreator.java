@@ -52,6 +52,10 @@ public class ParallelBibleCreator {
 			TextFiles.createTextFilesByDirectory();
 			break;
 
+		case Constants.FORMAT_WORDDOCUMENT:
+			WordDoc.createWordDocument();
+			break;
+
 		case Constants.FORMAT_JSON:
 
 			break;
