@@ -29,6 +29,8 @@ public class ParallelBibleCreator {
 	public static String outputDirectory;
 	public static String biblePortions;
 	public static boolean keepStrongNumbers = false;
+	public static boolean bibleTextDirectionRTL;
+	public static boolean useTableFormatForVerses = false;
 
 	/**
 	 * @param args
@@ -99,6 +101,12 @@ public class ParallelBibleCreator {
 			bibleSourceDirectory = INFORMATION.getProperty("bibleSourceDirectory");
 			outputDirectory = INFORMATION.getProperty("outputDirectory");
 			biblePortions = INFORMATION.getProperty("biblePortions");
+			if ("rtl".equalsIgnoreCase(INFORMATION.getProperty("bibleTextDirection"))) {
+				bibleTextDirectionRTL = true;
+			}
+			if ("yes".equalsIgnoreCase(INFORMATION.getProperty("useTableFormatForVerses"))) {
+				useTableFormatForVerses = true;
+			}
 		}
 		return true;
 	}
@@ -122,6 +130,10 @@ public class ParallelBibleCreator {
 				"Download both *-information.ini files as well as bible text files in the format *.ont or *.nt");
 		System.out.println(
 				"bibleVersionForBookNames => Optional value, Mention which bible version should be considered for displaying the book names");
+		System.out.println(
+				"bibleTextDirection => Optional. Supported values are rtl, ltr. Using rtl will apply reverse of the verses for languages other than Hebrew (iw)");
+		System.out.println(
+				"useTableFormatForVerses => Optional, Supported values are yes, no. This feature will only work when the outputFormat=WordDocument.");
 		System.out.println(
 				"bibleSourcePath => give the full directory path where the bible text & corresponding *-information.ini files are stored");
 		System.out.println("Use \\\\ or / in instead of just single \\ in the file path");

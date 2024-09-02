@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 
 /**
  * 
@@ -18,8 +19,7 @@ public class Utilities {
 		return version + "-" + threeLetterCode + "-" + chapter;
 	}
 
-	public static String generateKeyforVerseMap(String version, String threeLetterCode, String chapter,
-			String number) {
+	public static String generateKeyforVerseMap(String version, String threeLetterCode, String chapter, String number) {
 		return version + "-" + threeLetterCode + "-" + chapter + "-" + number;
 	}
 
@@ -82,17 +82,37 @@ public class Utilities {
 		return text.replaceAll("&nbsp;", "");
 	}
 
-	public static String replaceLastOccurrence(String original, String target, String replacement) { 
-        int lastIndex = original.lastIndexOf(target); 
-  
-        if (lastIndex == -1) { 
-            // Target substring not found 
-            return original; 
-        } 
-  
-        String before = original.substring(0, lastIndex); 
-        String after = original.substring(lastIndex + target.length()); 
-  
-        return before + replacement + after; 
-    } 
+	public static String replaceLastOccurrence(String original, String target, String replacement) {
+		int lastIndex = original.lastIndexOf(target);
+
+		if (lastIndex == -1) {
+			// Target substring not found
+			return original;
+		}
+
+		String before = original.substring(0, lastIndex);
+		String after = original.substring(lastIndex + target.length());
+
+		return before + replacement + after;
+	}
+
+	public static String reverseText(String verseText) {
+		String[] words = verseText.split(" ");
+		// Reverse the array using a loop
+		for (int i = 0; i < words.length / 2; i++) {
+			String temp = words[i];
+			words[i] = words[words.length - 1 - i];
+			words[words.length - 1 - i] = temp;
+		}
+		verseText = "";
+		words[0] = "." + replaceLastOccurrence(words[0], ".", "");
+		for (int i = 0; i < words.length; i++) {
+			verseText += words[i];
+			if (i < words.length - 2) {
+				verseText += " ";
+			}
+		}
+		return verseText;
+	}
+
 }
