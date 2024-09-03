@@ -186,35 +186,91 @@ public class WordDoc extends BiblesMap {
 
 		CTSectPr section = body.getSectPr();
 
+		applyPageSize(section);
+
+		System.out.println("Page Setting completed");
+	}
+
+	private static void applyPageSize(CTSectPr section) {
 		if (!section.isSetPgSz()) {
 			section.addNewPgSz();
 		}
 		CTPageSz pageSize = section.getPgSz();
-		pageSize.setOrient(STPageOrientation.LANDSCAPE);
-		pageSize.setW(BigInteger.valueOf(1190 * 20));
-		pageSize.setH(BigInteger.valueOf(1684 * 20));
 
-		// Letter 612x792
-		// LetterSmall 612x792
-		// Tabloid 792x1224
-		// Ledger 1224x792
-		// Legal 612x1008
-		// Statement 396x612
-		// Executive 540x720
-		// A0 2384x3371
-		// A1 1685x2384
-		// A2 1190x1684
-		// A3 842x1190
-		// A4 595x842
-		// A4Small 595x842
-		// A5 420x595
-		// B4 729x1032
-		// B5 516x729
-		// Folio 612x936
-		// Quarto 610x780
-		// 10x14 720x1008
+		switch (ParallelBibleCreator.wordDocumentPageSize) {
+		case "Letter":
+			setPageSize(pageSize, 612, 792);
+			break;
+		case "LetterSmall":
+			setPageSize(pageSize, 612, 792);
+			break;
+		case "Tabloid":
+			setPageSize(pageSize, 792, 1224);
+			break;
+		case "Ledger":
+			setPageSize(pageSize, 1224, 792);
+			break;
+		case "Legal":
+			setPageSize(pageSize, 612, 1008);
+			break;
+		case "Statement":
+			setPageSize(pageSize, 396, 612);
+			break;
+		case "Executive":
+			setPageSize(pageSize, 540, 720);
+			break;
+		case "A0":
+			setPageSize(pageSize, 2384, 3371);
+			break;
+		case "A1":
+			setPageSize(pageSize, 1685, 2384);
+			break;
+		case "A2":
+			setPageSize(pageSize, 1190, 1684);
+			break;
+		case "A3":
+			setPageSize(pageSize, 842, 1190);
+			break;
+		case "A4":
+			setPageSize(pageSize, 595, 842);
+			break;
+		case "A4Small":
+			setPageSize(pageSize, 595, 842);
+			break;
+		case "A5":
+			setPageSize(pageSize, 420, 595);
+			break;
+		case "B4":
+			setPageSize(pageSize, 729, 1032);
+			break;
+		case "B5":
+			setPageSize(pageSize, 516, 729);
+			break;
+		case "Folio":
+			setPageSize(pageSize, 612, 936);
+			break;
+		case "Quarto":
+			setPageSize(pageSize, 610, 780);
+			break;
+		case "10x14":
+			setPageSize(pageSize, 720, 1008);
+			break;
+		default:// A4
+			setPageSize(pageSize, 595, 842);
+			break;
+		}
+	}
 
-		System.out.println("Page Setting completed");
+	private static void setPageSize(CTPageSz pageSize, int width, int height) {
+		if ("LANDSCAPE".equalsIgnoreCase(ParallelBibleCreator.wordDocumentPageOrientation)) {
+			pageSize.setOrient(STPageOrientation.LANDSCAPE);
+			pageSize.setW(BigInteger.valueOf(height * 20));
+			pageSize.setH(BigInteger.valueOf(width * 20));
+		} else {
+			pageSize.setOrient(STPageOrientation.PORTRAIT);
+			pageSize.setW(BigInteger.valueOf(width * 20));
+			pageSize.setH(BigInteger.valueOf(height * 20));
+		}
 	}
 
 	private static void createMetaData(XWPFDocument document) {
@@ -631,6 +687,7 @@ public class WordDoc extends BiblesMap {
 		XWPFParagraph paragraph = document.createParagraph();
 		paragraph = document.createParagraph();
 		CTSectPr ctSectPr = paragraph.getCTP().addNewPPr().addNewSectPr();
+		applyPageSize(ctSectPr);
 		CTColumns ctColumns = ctSectPr.addNewCols();
 		ctColumns.setNum(BigInteger.valueOf(noOfColumns));
 
@@ -639,11 +696,12 @@ public class WordDoc extends BiblesMap {
 			if (pageMar == null) {
 				pageMar = ctSectPr.addNewPgMar();
 			}
-			pageMar.setLeft(BigInteger.valueOf(648));// 0.45"*72*20
+			int margin = (int) (ParallelBibleCreator.wordDocumentPageMargin * 72 * 20);
+			pageMar.setLeft(BigInteger.valueOf(margin));// 0.45"*72*20
 			// 720 TWentieths of an Inch Point (Twips) = 720/20 = 36 pt; 36/72 = 0.5"
-			pageMar.setRight(BigInteger.valueOf(648));
-			pageMar.setTop(BigInteger.valueOf(648));
-			pageMar.setBottom(BigInteger.valueOf(648));
+			pageMar.setRight(BigInteger.valueOf(margin));
+			pageMar.setTop(BigInteger.valueOf(margin));
+			pageMar.setBottom(BigInteger.valueOf(margin));
 			// pageMar.setFooter(BigInteger.valueOf(720));
 			// pageMar.setHeader(BigInteger.valueOf(720));
 			// pageMar.setGutter(BigInteger.valueOf(0));
@@ -867,7 +925,7 @@ public class WordDoc extends BiblesMap {
 						}
 						run = paragraph.createRun();
 						run.setText(verseText);
-					}else {
+					} else {
 						cell = tableRowTwo.getCell(i++);
 
 						paragraph = cell.getParagraphArray(0);

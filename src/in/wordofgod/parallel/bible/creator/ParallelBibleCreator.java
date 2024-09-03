@@ -31,6 +31,9 @@ public class ParallelBibleCreator {
 	public static boolean keepStrongNumbers = false;
 	public static boolean bibleTextDirectionRTL;
 	public static boolean useTableFormatForVerses = false;
+	public static String wordDocumentPageSize;
+	public static String wordDocumentPageOrientation;
+	public static double wordDocumentPageMargin;
 
 	/**
 	 * @param args
@@ -106,6 +109,25 @@ public class ParallelBibleCreator {
 			}
 			if ("yes".equalsIgnoreCase(INFORMATION.getProperty("useTableFormatForVerses"))) {
 				useTableFormatForVerses = true;
+			}
+			wordDocumentPageSize = INFORMATION.getProperty("wordDocumentPageSize");
+			if (wordDocumentPageSize == null) {
+				wordDocumentPageSize = "A4";
+			}
+			wordDocumentPageOrientation = INFORMATION.getProperty("wordDocumentPageOrientation");
+			if (wordDocumentPageOrientation == null) {
+				wordDocumentPageOrientation = "PORTRAIT";
+			}
+			String temp = INFORMATION.getProperty("wordDocumentPageMargin");
+			if (temp == null) {
+				wordDocumentPageMargin = 0.45;
+			} else {
+				try {
+					wordDocumentPageMargin = Double.parseDouble(temp);
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+					wordDocumentPageMargin = 0.45;
+				}
 			}
 		}
 		return true;
