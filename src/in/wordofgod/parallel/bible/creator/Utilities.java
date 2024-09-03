@@ -69,6 +69,25 @@ public class Utilities {
 			text = text.replaceAll("<(WH[0-9]+)>", "@$1#");
 			text = text.replaceAll("<(WG[0-9]+)>", "@$1#");
 		}
+
+		// <TS1>The History of Creation<Ts>
+		while (text.contains("<TS1>")) {
+			//text = text.replaceFirst("<TS1>.+<Ts>", "");
+			int startPos = text.indexOf("<TS1>");
+			int endPos = text.indexOf("<Ts>");
+			String htmlTag = text.substring(startPos, endPos + 4);
+			text = text.replace(htmlTag, "");
+		}
+
+		// <RF>Ps. 33:6, 9<Rf>
+		while (text.contains("<RF>")) {
+			//text = text.replaceFirst("<RF>.+<Rf>", "");
+			int startPos = text.indexOf("<RF>");
+			int endPos = text.indexOf("<Rf>");
+			String htmlTag = text.substring(startPos, endPos + 4);
+			text = text.replace(htmlTag, "");
+		}
+
 		while (text.contains("<")) {
 			int startPos = text.indexOf("<");
 			int endPos = text.indexOf(">");

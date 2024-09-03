@@ -18,6 +18,7 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRelation;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBookmark;
@@ -189,19 +190,29 @@ public class WordDoc extends BiblesMap {
 			section.addNewPgSz();
 		}
 		CTPageSz pageSize = section.getPgSz();
-		pageSize.setOrient(STPageOrientation.PORTRAIT);
-		pageSize.setW(BigInteger.valueOf(595 * 20));
-		pageSize.setH(BigInteger.valueOf(842 * 20));
+		pageSize.setOrient(STPageOrientation.LANDSCAPE);
+		pageSize.setW(BigInteger.valueOf(1190 * 20));
+		pageSize.setH(BigInteger.valueOf(1684 * 20));
 
-		// CTPageMar pageMar = section.getPgMar();
-		// if (pageMar == null) {
-		// pageMar = section.addNewPgMar();
-		// }
-		// pageMar.setLeft(BigInteger.valueOf(648));// 0.45"*72*20
-		// 720 TWentieths of an Inch Point (Twips) = 720/20 = 36 pt; 36/72 = 0.5"
-		// pageMar.setRight(BigInteger.valueOf(648));
-		// pageMar.setTop(BigInteger.valueOf(360));
-		// pageMar.setBottom(BigInteger.valueOf(648));
+		// Letter 612x792
+		// LetterSmall 612x792
+		// Tabloid 792x1224
+		// Ledger 1224x792
+		// Legal 612x1008
+		// Statement 396x612
+		// Executive 540x720
+		// A0 2384x3371
+		// A1 1685x2384
+		// A2 1190x1684
+		// A3 842x1190
+		// A4 595x842
+		// A4Small 595x842
+		// A5 420x595
+		// B4 729x1032
+		// B5 516x729
+		// Folio 612x936
+		// Quarto 610x780
+		// 10x14 720x1008
 
 		System.out.println("Page Setting completed");
 	}
@@ -702,16 +713,12 @@ public class WordDoc extends BiblesMap {
 	private static void createChaptersContentByText(Book bookForNavigation, XWPFDocument document) {
 		XWPFParagraph paragraph = null;
 		XWPFRun run = null;
+		int counter = 0;
 		for (Chapter chapterForNavigation : bookForNavigation.getChapters()) {
-			paragraph = document.createParagraph();
-			paragraph.setAlignment(ParagraphAlignment.CENTER);
-			run = paragraph.createRun();
-			run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.CHAPTER_HEADING_FONT));
-			run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.CHAPTER_HEADING_FONT_SIZE));
-			run.setText(bookForNavigation.getLongName() + " " + chapterForNavigation.getChapter());
-			CTShd cTShd = run.getCTR().addNewRPr().addNewShd();
-			cTShd.setVal(STShd.CLEAR);
-			cTShd.setFill("ABABAB");
+			if (LIMIT_OUTPUT && counter++ > 2) {
+				return;
+			}
+			paragraph = createChapterHeader(bookForNavigation, document, chapterForNavigation);
 			CTBookmark bookmark = paragraph.getCTP().addNewBookmarkStart();
 			bookmark.setName(
 					bookForNavigation.getLongName().replaceAll(" ", "_") + "_" + chapterForNavigation.getChapter());
@@ -758,19 +765,50 @@ public class WordDoc extends BiblesMap {
 		}
 	}
 
+	private static XWPFParagraph createChapterHeader(Book bookForNavigation, XWPFDocument document,
+			Chapter chapterForNavigation) {
+		XWPFParagraph paragraph;
+		XWPFRun run;
+		paragraph = document.createParagraph();
+		paragraph.setAlignment(ParagraphAlignment.CENTER);
+
+		run = paragraph.createRun();
+		run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.CHAPTER_HEADING_FONT));
+		run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.CHAPTER_HEADING_FONT_SIZE));
+		run.setColor("ABABAB");
+		run.setText(". ");
+		CTShd cTShd = run.getCTR().addNewRPr().addNewShd();
+		cTShd.setVal(STShd.CLEAR);
+		cTShd.setFill("ABABAB");
+
+		run = paragraph.createRun();
+		run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.CHAPTER_HEADING_FONT));
+		run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.CHAPTER_HEADING_FONT_SIZE));
+		run.setText(bookForNavigation.getLongName() + " " + chapterForNavigation.getChapter());
+		cTShd = run.getCTR().addNewRPr().addNewShd();
+		cTShd.setVal(STShd.CLEAR);
+		cTShd.setFill("ABABAB");
+
+		run = paragraph.createRun();
+		run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.CHAPTER_HEADING_FONT));
+		run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.CHAPTER_HEADING_FONT_SIZE));
+		run.setColor("ABABAB");
+		run.setText(" .");
+		cTShd = run.getCTR().addNewRPr().addNewShd();
+		cTShd.setVal(STShd.CLEAR);
+		cTShd.setFill("ABABAB");
+
+		return paragraph;
+	}
+
 	private static void createChaptersContentByTable(Book bookForNavigation, XWPFDocument document) {
 		XWPFParagraph paragraph = null;
-		XWPFRun run = null;
+		int counter = 0;
 		for (Chapter chapterForNavigation : bookForNavigation.getChapters()) {
-			paragraph = document.createParagraph();
-			paragraph.setAlignment(ParagraphAlignment.CENTER);
-			run = paragraph.createRun();
-			run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.CHAPTER_HEADING_FONT));
-			run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.CHAPTER_HEADING_FONT_SIZE));
-			run.setText(bookForNavigation.getLongName() + " " + chapterForNavigation.getChapter());
-			CTShd cTShd = run.getCTR().addNewRPr().addNewShd();
-			cTShd.setVal(STShd.CLEAR);
-			cTShd.setFill("ABABAB");
+			if (LIMIT_OUTPUT && counter++ > 2) {
+				return;
+			}
+			paragraph = createChapterHeader(bookForNavigation, document, chapterForNavigation);
 			CTBookmark bookmark = paragraph.getCTP().addNewBookmarkStart();
 			bookmark.setName(
 					bookForNavigation.getLongName().replaceAll(" ", "_") + "_" + chapterForNavigation.getChapter());
@@ -780,19 +818,38 @@ public class WordDoc extends BiblesMap {
 
 			// create table
 			XWPFTable table = document.createTable();
+			table.setCellMargins(0, 72, 0, 72); // set margins here
 
 			// create first row
 			XWPFTableRow tableRowOne = table.getRow(0);
-			tableRowOne.getCell(0).setText("#");
+
+			paragraph = tableRowOne.getCell(0).getParagraphArray(0);
+			paragraph.setAlignment(ParagraphAlignment.CENTER);
+			paragraph.setSpacingAfter(0);
+			XWPFRun run = paragraph.createRun();
+			run.setText("#");
+			// tableRowOne.getCell(0).setParagraph(paragraph);
+
+			XWPFTableCell cell = null;
 			for (String version : biblesMap.keySet()) {
-				tableRowOne.addNewTableCell().setText(biblesMap.get(version).getAbbr());
+				cell = tableRowOne.addNewTableCell();
+				paragraph = cell.getParagraphArray(0);
+				paragraph.setAlignment(ParagraphAlignment.CENTER);
+				paragraph.setSpacingAfter(0);
+				run = paragraph.createRun();
+				run.setText(biblesMap.get(version).getShortName());
 			}
 
 			for (Verse verseForNavigation : chapterForNavigation.getVerses()) {
 				int i = 0;
 				// create second row
 				XWPFTableRow tableRowTwo = table.createRow();
-				tableRowTwo.getCell(i++).setText(verseForNavigation.getNumber() + ". ");
+				cell = tableRowTwo.getCell(i++);
+				paragraph = cell.getParagraphArray(0);
+				paragraph.setSpacingBefore(72);
+				paragraph.setSpacingAfter(72);
+				run = paragraph.createRun();
+				run.setText(verseForNavigation.getNumber() + ". ");
 
 				for (String version : biblesMap.keySet()) {
 					Verse verse = versesMap
@@ -800,7 +857,27 @@ public class WordDoc extends BiblesMap {
 									chapterForNavigation.getChapter(), verseForNavigation.getNumber()));
 					if (verse != null) {
 						String verseText = Utilities.removeHTMLTags(verse.getUnParsedText());
-						tableRowTwo.getCell(i++).setText(verseText);
+						cell = tableRowTwo.getCell(i++);
+
+						paragraph = cell.getParagraphArray(0);
+						paragraph.setSpacingBefore(72);
+						paragraph.setSpacingAfter(72);
+						if ("iw".equalsIgnoreCase(biblesMap.get(version).getLanguageCode())) {
+							paragraph.setAlignment(ParagraphAlignment.RIGHT);
+						}
+						run = paragraph.createRun();
+						run.setText(verseText);
+					}else {
+						cell = tableRowTwo.getCell(i++);
+
+						paragraph = cell.getParagraphArray(0);
+						paragraph.setSpacingBefore(72);
+						paragraph.setSpacingAfter(72);
+						if ("iw".equalsIgnoreCase(biblesMap.get(version).getLanguageCode())) {
+							paragraph.setAlignment(ParagraphAlignment.RIGHT);
+						}
+						run = paragraph.createRun();
+						run.setText("Not available in this version");
 					}
 				}
 			}
