@@ -44,7 +44,11 @@ Or INFORMATION.ini file can be prepared with the below tips:
 - You can give more than one bible portion separated by comma. 
     - Example: biblePortions=Gen 1:1-5; Mat 5:1-10 (denotes genesis chapter 1 and verses from 1 to 5 as well as matthew chapter 5 and verses from 1 to 10)
 - Name of the books should be this from this list only: Gen, Exo, Lev, Num, Deu, Jos, Jdg, Rth, 1Sa, 2Sa, 1Ki, 2Ki, 1Ch, 2Ch, Ezr, Neh, Est, Job, Psa, Pro, Ecc, Son, Isa, Jer, Lam, Eze, Dan, Hos, Joe, Amo, Oba, Jon, Mic, Nah, Hab, Zep, Hag, Zec, Mal, Mat, Mar, Luk, Joh, Act, Rom, 1Co, 2Co, Gal, Eph, Php, Col, 1Th, 2Th, 1Ti, 2Ti, Tit, Phm, Heb, Jas, 1Pe, 2Pe, 1Jn, 2Jn, 3Jn, Jud, Rev
-
+- bibleTextDirection => Optional. Supported values are rtl, ltr. Using rtl will apply reverse of the verses for languages other than Hebrew (iw)
+- useTableFormatForVerses => Optional, Supported values are yes, no. This feature will only work when the outputFormat=WordDocument. 
+- wordDocumentPageSize=> Optional, Supported values are Letter, Tabloid, Ledger, Legal, Statement, Executive, A0, A1, A2, A3, A4, A5, B4, B5, Folio, Quarto, 10x14 
+- wordDocumentPageOrientation => Optional, Supported values are PORTRAIT, LANDSCAPE
+- wordDocumentPageMargin => Optional, Give any number or decimal values in inches. Ex. 0.45
 
 # Supported formats:
 1. TextFiles

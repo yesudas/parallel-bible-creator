@@ -18,7 +18,9 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRelation;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.xwpf.usermodel.XWPFTable.XWPFBorderType;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell.XWPFVertAlign;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBookmark;
@@ -29,6 +31,10 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageMar;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageSz;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTShd;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTc;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcBorders;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcPr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STBorder;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STPageOrientation;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STShd;
 
@@ -768,7 +774,7 @@ public class WordDoc extends BiblesMap {
 		System.out.println("Content Creation Completed...");
 	}
 
-	private static void createChaptersContentByText(Book bookForNavigation, XWPFDocument document) {
+	private static void createChaptersContentByText1(Book bookForNavigation, XWPFDocument document) {
 		XWPFParagraph paragraph = null;
 		XWPFRun run = null;
 		int counter = 0;
@@ -824,6 +830,118 @@ public class WordDoc extends BiblesMap {
 						run.addBreak();
 					}
 				}
+			}
+		}
+	}
+
+	private static void createChaptersContentByText(Book bookForNavigation, XWPFDocument document) {
+		XWPFParagraph paragraph = null;
+		XWPFRun run = null;
+		int counter = 0;
+		for (Chapter chapterForNavigation : bookForNavigation.getChapters()) {
+			if (LIMIT_OUTPUT && counter++ > 2) {
+				return;
+			}
+			paragraph = createChapterHeader(bookForNavigation, document, chapterForNavigation);
+			CTBookmark bookmark = paragraph.getCTP().addNewBookmarkStart();
+			bookmark.setName(
+					bookForNavigation.getLongName().replaceAll(" ", "_") + "_" + chapterForNavigation.getChapter());
+			bookmark.setId(BigInteger.valueOf(uniqueBookMarkCounter));
+			paragraph.getCTP().addNewBookmarkEnd().setId(BigInteger.valueOf(uniqueBookMarkCounter));
+			uniqueBookMarkCounter++;
+			for (Verse verseForNavigation : chapterForNavigation.getVerses()) {
+
+				// create table
+				XWPFTable table = document.createTable();
+				table.setCellMargins(0, 72, 0, 72); // set margins here
+				table.getCTTbl().getTblPr().unsetTblBorders();
+
+				// create first row
+				XWPFTableRow tableRow = table.getRow(0);
+				XWPFTableCell cell = null;
+				// By default only first cell is added automatically, so add additional cells
+				// manually.
+				tableRow.addNewTableCell();
+				tableRow.addNewTableCell();
+
+				cell = tableRow.getCell(0);
+				paragraph = cell.getParagraphArray(0);
+				paragraph.setSpacingAfter(0);
+				run = paragraph.createRun();
+				run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.VERSE_FONT));
+				run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.VERSE_FONT_SIZE));
+				run.setBold(true);
+				run.setText(verseForNavigation.getNumber() + ". ");
+
+				bookmark = paragraph.getCTP().addNewBookmarkStart();
+				bookmark.setName(bookForNavigation.getLongName().replaceAll(" ", "_") + "_"
+						+ chapterForNavigation.getChapter() + "_" + verseForNavigation.getNumber());
+				bookmark.setId(BigInteger.valueOf(uniqueBookMarkCounter));
+				paragraph.getCTP().addNewBookmarkEnd().setId(BigInteger.valueOf(uniqueBookMarkCounter));
+
+				boolean firstRowisDone = false;
+				for (String version : biblesMap.keySet()) {
+					if (!firstRowisDone) {
+						firstRowisDone = true;
+					} else {
+						tableRow = table.createRow();
+					}
+					Verse verse = versesMap
+							.get(Utilities.generateKeyforVerseMap(version, bookForNavigation.getThreeLetterCode(),
+									chapterForNavigation.getChapter(), verseForNavigation.getNumber()));
+					if (verse != null) {
+						String verseText = Utilities.removeHTMLTags(verse.getUnParsedText());
+
+						cell = tableRow.getCell(1);
+						cell.setVerticalAlignment(XWPFVertAlign.CENTER);
+						paragraph = cell.getParagraphArray(0);
+						paragraph.setSpacingBefore(0);
+						paragraph.setSpacingAfter(0);
+						// if ("iw".equalsIgnoreCase(biblesMap.get(version).getLanguageCode())) {
+						// paragraph.setAlignment(ParagraphAlignment.RIGHT);
+						// }
+						run = paragraph.createRun();
+
+						if (INCLUDE_VERSION_LABEL) {
+							run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.VERSE_FONT));
+							run.setFontSize(
+									languageEnglish.getInt(BibleToDocLanguage.STR_PARALLEL_BIBLE_SHORT_NAME_FONT_SIZE));
+							run.setText(version + "  ");
+						}
+
+						cell = tableRow.getCell(2);
+						paragraph = cell.getParagraphArray(0);
+						paragraph.setSpacingBefore(0);
+						paragraph.setSpacingAfter(0);
+						// if ("iw".equalsIgnoreCase(biblesMap.get(version).getLanguageCode())) {
+						// paragraph.setAlignment(ParagraphAlignment.RIGHT);
+						// }
+						run = paragraph.createRun();
+
+						run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.VERSE_FONT));
+						run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.VERSE_FONT_SIZE));
+						if (ParallelBibleCreator.bibleTextDirectionRTL
+								&& !"iw".equalsIgnoreCase(biblesMap.get(version).getLanguageCode())) {
+							run.setText(Utilities.reverseText(verseText.trim()));
+						} else {
+							run.setText(verseText.trim());
+						}
+						// run.addBreak();
+					}
+				}
+				tableRow = table.createRow();
+				CTTc ctTc = tableRow.getCell(0).getCTTc();
+				CTTcPr tcPr = ctTc.addNewTcPr();
+				CTTcBorders border = tcPr.addNewTcBorders();
+				border.addNewTop().setVal(STBorder.SINGLE);
+				ctTc = tableRow.getCell(1).getCTTc();
+				tcPr = ctTc.addNewTcPr();
+				border = tcPr.addNewTcBorders();
+				border.addNewTop().setVal(STBorder.SINGLE);
+				ctTc = tableRow.getCell(2).getCTTc();
+				tcPr = ctTc.addNewTcPr();
+				border = tcPr.addNewTcBorders();
+				border.addNewTop().setVal(STBorder.SINGLE);
 			}
 		}
 	}
@@ -908,7 +1026,6 @@ public class WordDoc extends BiblesMap {
 			paragraph.setSpacingAfter(0);
 			XWPFRun run = paragraph.createRun();
 			run.setText("#");
-			// tableRowOne.getCell(0).setParagraph(paragraph);
 
 			XWPFTableCell cell = null;
 			for (String version : biblesMap.keySet()) {
