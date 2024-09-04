@@ -793,6 +793,11 @@ public class WordDoc extends BiblesMap {
 				run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.VERSE_FONT_SIZE));
 				run.setBold(true);
 				run.setText(verseForNavigation.getNumber() + ". ");
+				bookmark = paragraph.getCTP().addNewBookmarkStart();
+				bookmark.setName(bookForNavigation.getLongName().replaceAll(" ", "_") + "_"
+						+ chapterForNavigation.getChapter() + "_" + verseForNavigation.getNumber());
+				bookmark.setId(BigInteger.valueOf(uniqueBookMarkCounter));
+				paragraph.getCTP().addNewBookmarkEnd().setId(BigInteger.valueOf(uniqueBookMarkCounter));
 
 				for (String version : biblesMap.keySet()) {
 					Verse verse = versesMap
@@ -805,7 +810,7 @@ public class WordDoc extends BiblesMap {
 							run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.VERSE_FONT));
 							run.setFontSize(
 									languageEnglish.getInt(BibleToDocLanguage.STR_PARALLEL_BIBLE_SHORT_NAME_FONT_SIZE));
-							run.setText(version + " ");
+							run.setText(version + "  ");
 						}
 						run = paragraph.createRun();
 						run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.VERSE_FONT));
@@ -855,6 +860,23 @@ public class WordDoc extends BiblesMap {
 		cTShd = run.getCTR().addNewRPr().addNewShd();
 		cTShd.setVal(STShd.CLEAR);
 		cTShd.setFill("ABABAB");
+
+		// Verses Index
+		uniqueBookMarkCounter++;
+		paragraph = document.createParagraph();
+		paragraph.setAlignment(ParagraphAlignment.CENTER);
+		run = paragraph.createRun();
+		run.addBreak();
+
+		for (Verse verse : chapterForNavigation.getVerses()) {
+			createAnchorLink(paragraph, verse.getNumber(),
+					bookForNavigation.getLongName().replaceAll(" ", "_") + "_" + chapterForNavigation.getChapter() + "_"
+							+ verse.getNumber(),
+					false, "    ", languageEnglish.getString(BibleToDocLanguage.STR_VERSE_INDEX_FONT),
+					languageEnglish.getInt(BibleToDocLanguage.STR_VERSE_INDEX_FONT_SIZE));
+		}
+		run = paragraph.createRun();
+		run.addBreak();
 
 		return paragraph;
 	}

@@ -16,7 +16,7 @@ public class ParallelBibleToDocLanguageEnglish implements BibleToDocLanguage {
 		stringsMap.put(BibleToDocLanguage.SUB_COMMON_NAME_FONT_SIZE, 72);
 		stringsMap.put(BibleToDocLanguage.STR_COMMON_NAME, "Parallel Bible");
 		stringsMap.put(BibleToDocLanguage.STR_AND, " & ");
-		stringsMap.put(BibleToDocLanguage.STR_PARALLEL_BIBLE_SHORT_NAME_FONT_SIZE, 8);
+		stringsMap.put(BibleToDocLanguage.STR_PARALLEL_BIBLE_SHORT_NAME_FONT_SIZE, 9);
 		
 		//Title Page
 		//stringsMap.put(BibleToDocLanguage.SUB_TITLE_1, "YLT BIBLE");
@@ -74,6 +74,8 @@ public class ParallelBibleToDocLanguageEnglish implements BibleToDocLanguage {
 		
 		stringsMap.put(BibleToDocLanguage.CHAPTER_HEADING_FONT, "Calibri (Body)");
 		stringsMap.put(BibleToDocLanguage.CHAPTER_HEADING_FONT_SIZE, 18);
+		stringsMap.put(BibleToDocLanguage.STR_VERSE_INDEX_FONT, "Calibri (Body)");
+		stringsMap.put(BibleToDocLanguage.STR_VERSE_INDEX_FONT_SIZE, 16);
 
 		stringsMap.put(BibleToDocLanguage.VERSE_FONT, "Calibri (Body)");
 		stringsMap.put(BibleToDocLanguage.VERSE_FONT_SIZE, 14);
