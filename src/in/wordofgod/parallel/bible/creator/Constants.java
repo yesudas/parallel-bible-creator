@@ -13,5 +13,6 @@ public class Constants {
 	public static final String FORMAT_TEXTFILES_BY_DIRECTORY = "TEXTFILESBYDIRECTORY";
 	public static final String FORMAT_JSON = "JSON";
 	public static final String FORMAT_WORDDOCUMENT = "WORDDOCUMENT";
+	public static final String FORMAT_WORDDOCUMENT_BOOKBYBOOK = "WORDDOCUMENTBOOKBYBOOK";
 
 }

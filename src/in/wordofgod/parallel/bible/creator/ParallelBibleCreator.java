@@ -61,6 +61,10 @@ public class ParallelBibleCreator {
 			WordDoc.createWordDocument();
 			break;
 
+		case Constants.FORMAT_WORDDOCUMENT_BOOKBYBOOK:
+			WordDoc.createWordDocumentBookByBook();
+			break;
+
 		case Constants.FORMAT_JSON:
 
 			break;
