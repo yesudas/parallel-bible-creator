@@ -1045,8 +1045,13 @@ public class WordDoc extends BiblesMap {
 				paragraph = cell.getParagraphArray(0);
 				paragraph.setAlignment(ParagraphAlignment.CENTER);
 				paragraph.setSpacingAfter(0);
-				run = paragraph.createRun();
-				run.setText(biblesMap.get(version).getShortName());
+				//run = paragraph.createRun();
+				//run.setText(biblesMap.get(version).getShortName());
+				
+				createAnchorLink(paragraph, biblesMap.get(version).getShortName(),
+						biblesMap.get(version).getAbbr().replaceAll(" ", "_"),
+						false, "    ", languageEnglish.getString(BibleToDocLanguage.VERSE_FONT),
+						languageEnglish.getInt(BibleToDocLanguage.STR_PARALLEL_BIBLE_SHORT_NAME_FONT_SIZE));
 			}
 
 			for (Verse verseForNavigation : chapterForNavigation.getVerses()) {
