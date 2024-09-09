@@ -18,7 +18,6 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRelation;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
-import org.apache.poi.xwpf.usermodel.XWPFTable.XWPFBorderType;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell.XWPFVertAlign;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
@@ -509,8 +508,15 @@ public class WordDoc extends BiblesMap {
 		run.addBreak();
 		run.addBreak();
 
+		CTBookmark bookmark = null;
 		for (String version : biblesMap.keySet()) {
 			Bible bible = biblesMap.get(version);
+
+			bookmark = paragraph.getCTP().addNewBookmarkStart();
+			bookmark.setName(biblesMap.get(version).getAbbr().replaceAll(" ", "_"));
+			bookmark.setId(BigInteger.valueOf(uniqueBookMarkCounter));
+			paragraph.getCTP().addNewBookmarkEnd().setId(BigInteger.valueOf(uniqueBookMarkCounter));
+			uniqueBookMarkCounter++;
 
 			// Bible Details
 			run = paragraph.createRun();
@@ -903,10 +909,16 @@ public class WordDoc extends BiblesMap {
 						run = paragraph.createRun();
 
 						if (INCLUDE_VERSION_LABEL) {
-							run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.VERSE_FONT));
-							run.setFontSize(
+							//run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.VERSE_FONT));
+							//run.setFontSize(
+								//	languageEnglish.getInt(BibleToDocLanguage.STR_PARALLEL_BIBLE_SHORT_NAME_FONT_SIZE));
+							//run.setText(version + "  ");
+							
+							createAnchorLink(paragraph, version + "  ",
+									biblesMap.get(version).getAbbr().replaceAll(" ", "_"),
+									false, "    ", languageEnglish.getString(BibleToDocLanguage.VERSE_FONT),
 									languageEnglish.getInt(BibleToDocLanguage.STR_PARALLEL_BIBLE_SHORT_NAME_FONT_SIZE));
-							run.setText(version + "  ");
+							
 						}
 
 						cell = tableRow.getCell(2);
