@@ -8,12 +8,23 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
-import java.util.Arrays;
+
+import in.wordofgod.bible.parser.vosgson.Book;
+import in.wordofgod.bible.parser.vosgson.Chapter;
+import in.wordofgod.bible.parser.vosgson.Verse;
 
 /**
  * 
  */
 public class Utilities {
+
+	public static String generateKeyforBooksMap(String version, String threeLetterCode) {
+		return version + "-" + threeLetterCode;
+	}
+
+	public static String generateKeyforBookVersionsMap(String threeLetterCode, String version) {
+		return version + "-" + threeLetterCode;
+	}
 
 	public static String generateKeyforChaptersMap(String version, String threeLetterCode, String chapter) {
 		return version + "-" + threeLetterCode + "-" + chapter;
@@ -26,6 +37,37 @@ public class Utilities {
 	public static String stripExtension(String version) {
 		return version != null && version.lastIndexOf(".") > 0 ? version.substring(0, version.lastIndexOf("."))
 				: version;
+	}
+
+	public static String removePlus(String text) {
+		if (text != null) {
+			return text.replaceAll("\\+", "");
+		} else {
+			return text;
+		}
+	}
+
+	public static String getLanguageName(String languageCode) {
+		switch (languageCode) {
+		case "iw":
+			return "Hebrew";
+		case "en":
+			return "English";
+		case "ta":
+			return "Tamil";
+		case "la":
+			return "Latin";
+		case "kn":
+			return "Kannada";
+		case "hi":
+			return "Hindi";
+		case "te":
+			return "Telugu";
+		case "grc":
+			return "Greek";
+		default:
+			return languageCode;
+		}
 	}
 
 	public static void createDir(String dirPath) {
@@ -72,7 +114,7 @@ public class Utilities {
 
 		// <TS1>The History of Creation<Ts>
 		while (text.contains("<TS1>")) {
-			//text = text.replaceFirst("<TS1>.+<Ts>", "");
+			// text = text.replaceFirst("<TS1>.+<Ts>", "");
 			int startPos = text.indexOf("<TS1>");
 			int endPos = text.indexOf("<Ts>");
 			String htmlTag = text.substring(startPos, endPos + 4);
@@ -81,7 +123,7 @@ public class Utilities {
 
 		// <RF>Ps. 33:6, 9<Rf>
 		while (text.contains("<RF>")) {
-			//text = text.replaceFirst("<RF>.+<Rf>", "");
+			// text = text.replaceFirst("<RF>.+<Rf>", "");
 			int startPos = text.indexOf("<RF>");
 			int endPos = text.indexOf("<Rf>");
 			String htmlTag = text.substring(startPos, endPos + 4);
@@ -99,6 +141,13 @@ public class Utilities {
 			text = text.replaceAll("#", ">");
 		}
 		return text.replaceAll("&nbsp;", "");
+	}
+
+	public static String getVerseDetails(Book bookForNavigation, Chapter chapterForNavigation, Verse verseForNavigation,
+			String version, Verse verse) {
+		return version + " => " + bookForNavigation.getLongName() + "; " + "Chaper: "
+				+ chapterForNavigation.getChapter() + "; Verse No: " + verseForNavigation.getNumber() + "; Verse: "
+				+ verse.getUnParsedText();
 	}
 
 	public static String replaceLastOccurrence(String original, String target, String replacement) {

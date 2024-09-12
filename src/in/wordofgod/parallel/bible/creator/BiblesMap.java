@@ -24,24 +24,23 @@ public class BiblesMap {
 	protected static Map<String, Bible> biblesMap = new LinkedHashMap<String, Bible>();
 	protected static Map<String, String> versionToAbbrMap = new HashMap<String, String>();
 	protected static Map<String, Book> booksMap = new HashMap<String, Book>();
+	protected static Map<String, Bible> bookVersionsMap = new HashMap<String, Bible>();
 	protected static Map<String, Chapter> chaptersMap = new HashMap<String, Chapter>();
 	protected static Map<String, Verse> versesMap = new HashMap<String, Verse>();
 	protected static Bible bibleForNavigation = null;
 
 	private static void buildBooksMap(String version, Bible bible) {
 		for (Book book : bible.getBooks()) {
-			booksMap.put(generateKeyforBooksMap(version, book.getThreeLetterCode()), book);
+			booksMap.put(Utilities.generateKeyforBooksMap(version, book.getThreeLetterCode()), book);
+			bookVersionsMap.put(Utilities.generateKeyforBookVersionsMap(book.getThreeLetterCode(), version), bible);
 			buildChaptersMap(version, book);
 		}
 	}
 
-	private static String generateKeyforBooksMap(String version, String threeLetterCode) {
-		return version + "-" + threeLetterCode;
-	}
-
 	private static void buildChaptersMap(String version, Book book) {
 		for (Chapter chapter : book.getChapters()) {
-			chaptersMap.put(Utilities.generateKeyforChaptersMap(version, book.getThreeLetterCode(), chapter.getChapter()),
+			chaptersMap.put(
+					Utilities.generateKeyforChaptersMap(version, book.getThreeLetterCode(), chapter.getChapter()),
 					chapter);
 			buildVersesMap(version, book, chapter);
 		}
@@ -93,12 +92,12 @@ public class BiblesMap {
 			return;
 		}
 		Bible bible = biblesMap.get(ParallelBibleCreator.bibleVersionForBookNames);
-		if (bible != null && bible.getBooks().size() > 27) {
+		if (bible != null && bible.getBooks().size() > 39) {
 			bibleForNavigation = bible;
 		} else {
 			for (String version : biblesMap.keySet()) {
 				bible = biblesMap.get(version);
-				if (bible.getBooks().size() > 27) {
+				if (bible.getBooks().size() > 39) {
 					bibleForNavigation = bible;
 					break;
 				}
@@ -114,7 +113,8 @@ public class BiblesMap {
 		String randomVersion = biblesMap.entrySet().iterator().next().getKey();
 		for (String chapter : chapterArray) {
 			sb.append(bookName).append(" ").append(chapter).append("\n");
-			Chapter chapterForNavigation = chaptersMap.get(Utilities.generateKeyforChaptersMap(randomVersion, bookName, chapter));
+			Chapter chapterForNavigation = chaptersMap
+					.get(Utilities.generateKeyforChaptersMap(randomVersion, bookName, chapter));
 			for (Verse verseForNavigation : chapterForNavigation.getVerses()) {
 				sb.append(bookName).append(" ").append(chapterForNavigation.getChapter()).append(":")
 						.append(verseForNavigation.getNumber()).append("\n");

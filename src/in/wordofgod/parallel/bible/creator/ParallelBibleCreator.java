@@ -34,6 +34,8 @@ public class ParallelBibleCreator {
 	public static String wordDocumentPageSize;
 	public static String wordDocumentPageOrientation;
 	public static double wordDocumentPageMargin;
+	public static boolean skipCreatorDetails = false;
+	public static String verseString;
 
 	/**
 	 * @param args
@@ -132,6 +134,13 @@ public class ParallelBibleCreator {
 					e.printStackTrace();
 					wordDocumentPageMargin = 0.45;
 				}
+			}
+			if ("yes".equalsIgnoreCase(INFORMATION.getProperty("skipCreatorDetails"))) {
+				skipCreatorDetails = true;
+			}
+			verseString = INFORMATION.getProperty("verseString");
+			if (verseString == null) {
+				verseString = "Verse";
 			}
 		}
 		return true;

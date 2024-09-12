@@ -9,7 +9,7 @@ If you download a parallel-bible-creator.jar file, you will need a Java Runtime 
 Just run
 
 ~~~
-java -jar parallel-bible-creator.jar
+java -jar parallel-bible-creator.jar -Xmx4096m 
 ~~~
 
 on the command line for usage information.

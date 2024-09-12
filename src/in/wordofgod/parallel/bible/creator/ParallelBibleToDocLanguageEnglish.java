@@ -16,7 +16,7 @@ public class ParallelBibleToDocLanguageEnglish implements BibleToDocLanguage {
 		stringsMap.put(BibleToDocLanguage.SUB_COMMON_NAME_FONT_SIZE, 72);
 		stringsMap.put(BibleToDocLanguage.STR_COMMON_NAME, "Parallel Bible");
 		stringsMap.put(BibleToDocLanguage.STR_AND, " & ");
-		stringsMap.put(BibleToDocLanguage.STR_PARALLEL_BIBLE_SHORT_NAME_FONT_SIZE, 9);
+		stringsMap.put(BibleToDocLanguage.STR_PARALLEL_BIBLE_SHORT_NAME_FONT_SIZE, 12);
 		
 		//Title Page
 		//stringsMap.put(BibleToDocLanguage.SUB_TITLE_1, "YLT BIBLE");
@@ -52,7 +52,7 @@ public class ParallelBibleToDocLanguageEnglish implements BibleToDocLanguage {
 		
 		//PDF Issue Guidance Page
 		stringsMap.put(BibleToDocLanguage.STR_PDF_INDEX_ISSUE, "");
-		stringsMap.put(BibleToDocLanguage.STR_PDF_INDEX_ISSUE_ENGLISH, "If you are using this PDF in mobile, Navigation by Index may not work with Google Drive's PDF viewer. I would recommend ReadEra App for better performance and navigation experience.");
+		stringsMap.put(BibleToDocLanguage.STR_PDF_INDEX_ISSUE_ENGLISH, "If you are using this PDF in mobile, Navigation by Index may not work properly. We would recommend ReadEra App for better performance and navigation experience.");
 		stringsMap.put(BibleToDocLanguage.STR_PDF_INDEX_ISSUE_FONT, "Calibri (Body)");
 		stringsMap.put(BibleToDocLanguage.STR_PDF_INDEX_ISSUE_FONT_SIZE, 24);
 

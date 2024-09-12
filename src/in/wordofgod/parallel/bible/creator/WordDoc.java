@@ -52,7 +52,7 @@ public class WordDoc extends BiblesMap {
 
 	public static final String EXTENSION = ".docx";
 
-	private static boolean LIMIT_OUTPUT = true;
+	private static boolean LIMIT_OUTPUT = false;
 	private static boolean INCLUDE_VERSION_LABEL = true;
 	private static boolean bookByBook = false;
 	private static boolean NEW_TESTAMENT_ONLY = false;
@@ -145,7 +145,7 @@ public class WordDoc extends BiblesMap {
 
 			createPageSettings(document);
 			createMetaData(document);
-			createTitlePage(document);
+			createTitlePage(document, null);
 			createBookDetailsPage(document, languageEnglish);
 			createPDFIssuePage(document);
 			createIndex(document);
@@ -165,7 +165,7 @@ public class WordDoc extends BiblesMap {
 
 		System.out.println("Word Document BIBLE Creation started");
 
-		createIntroduction();
+		// createIntroduction();
 
 		createContent(null);
 		outputStatistics(bibleForNavigation);
@@ -176,7 +176,7 @@ public class WordDoc extends BiblesMap {
 			XWPFDocument document = new XWPFDocument();
 			createPageSettings(document);
 			createMetaData(document);
-			createTitlePage(document);
+			createTitlePage(document, null);
 			createBookDetailsPage(document, languageEnglish);
 			createPDFIssuePage(document);
 			createIndex(document);
@@ -302,6 +302,9 @@ public class WordDoc extends BiblesMap {
 	}
 
 	private static void createMetaData(XWPFDocument document) {
+		if (ParallelBibleCreator.skipCreatorDetails) {
+			return;
+		}
 		CoreProperties props = document.getProperties().getCoreProperties();
 		// props.setCreated("2019-08-14T21:00:00z");
 		props.setLastModifiedByUser(languageEnglish.getString(BibleToDocLanguage.STR_CREATED_BY_DETAILS));
@@ -316,7 +319,7 @@ public class WordDoc extends BiblesMap {
 		System.out.println("Meta Data Creation completed");
 	}
 
-	private static void createTitlePage(XWPFDocument document) {
+	private static void createTitlePage(XWPFDocument document, Book bookForNavigation) {
 		XWPFParagraph paragraph = null;
 		XWPFRun run = null;
 
@@ -327,61 +330,14 @@ public class WordDoc extends BiblesMap {
 		run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.SUB_COMMON_NAME_FONT_SIZE));
 		run.setText(languageEnglish.getString(BibleToDocLanguage.STR_COMMON_NAME));
 
-		paragraph = document.createParagraph();
-		paragraph.setAlignment(ParagraphAlignment.CENTER);
-		run = paragraph.createRun();
-
-		StringBuilder sb = new StringBuilder();
-		for (String version : biblesMap.keySet()) {
-			sb.append(biblesMap.get(version).getLanguageCode() + " - " + biblesMap.get(version).getCommonName());
-			sb.append(languageEnglish.getString(BibleToDocLanguage.STR_AND));
+		if (bookForNavigation != null) {
+			paragraph = document.createParagraph();
+			paragraph.setAlignment(ParagraphAlignment.CENTER);
+			run = paragraph.createRun();
+			run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.BOOK_HEADING_FONT));
+			run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.BOOK_HEADING_FONT_SIZE));
+			run.setText(bookForNavigation.getLongName());
 		}
-		String result = Utilities.replaceLastOccurrence(sb.toString(),
-				languageEnglish.getString(BibleToDocLanguage.STR_AND), "");
-
-		run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.SUB_TITLE_1_FONT));
-		run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.SUB_TITLE_1_FONT_SIZE));
-		run.setText(result);
-
-		run.addBreak();
-		run.addBreak();
-		run.addBreak();
-
-		paragraph = document.createParagraph();
-		paragraph.setAlignment(ParagraphAlignment.CENTER);
-		run = paragraph.createRun();
-		run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.SUB_TITLE_2_FONT));
-		run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.SUB_TITLE_2_FONT_SIZE));
-		run.setText("| xxxx Books |");
-		paragraph = document.createParagraph();
-		paragraph.setAlignment(ParagraphAlignment.CENTER);
-		run = paragraph.createRun();
-		run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.SUB_TITLE_2_FONT));
-		run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.SUB_TITLE_2_FONT_SIZE));
-		run.setText("| xxxx Chapters |");
-		paragraph = document.createParagraph();
-		paragraph.setAlignment(ParagraphAlignment.CENTER);
-		run = paragraph.createRun();
-		run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.SUB_TITLE_2_FONT));
-		run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.SUB_TITLE_2_FONT_SIZE));
-		run.setText("| xxxx Verses |");
-
-		paragraph = document.createParagraph();
-		paragraph.setAlignment(ParagraphAlignment.CENTER);
-		run = paragraph.createRun();
-		run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.SUB_TITLE_3_FONT));
-		run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.SUB_TITLE_3_FONT_SIZE));
-		run.addBreak();
-		run.addBreak();
-		run.addBreak();
-		run.addBreak();
-		run.setText(languageEnglish.getString(BibleToDocLanguage.STR_CREATED_BY_LABEL));
-		paragraph = document.createParagraph();
-		paragraph.setAlignment(ParagraphAlignment.CENTER);
-		run = paragraph.createRun();
-		run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.SUB_TITLE_4_FONT));
-		run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.SUB_TITLE_4_FONT_SIZE));
-		run.setText(languageEnglish.getString(BibleToDocLanguage.STR_CREATED_BY_DETAILS));
 
 		run.addBreak();
 		paragraph = document.createParagraph();
@@ -390,6 +346,68 @@ public class WordDoc extends BiblesMap {
 		run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.MORE_INFO_FONT));
 		run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.MORE_INFO_FONT_SIZE));
 		run.setText(languageEnglish.getString(BibleToDocLanguage.MORE_INFO));
+		run.addBreak();
+
+		paragraph = document.createParagraph();
+		paragraph.setAlignment(ParagraphAlignment.CENTER);
+		run = paragraph.createRun();
+		run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.MORE_INFO_FONT));
+		run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.MORE_INFO_FONT_SIZE));
+		run.setColor("FF0000");
+		run.setText(languageEnglish.getString(BibleToDocLanguage.STR_PDF_INDEX_ISSUE_ENGLISH));
+		run.addBreak();
+		run.addBreak();
+
+		paragraph = document.createParagraph();
+		paragraph.setAlignment(ParagraphAlignment.LEFT);
+
+		int counter = 1;
+		for (String version : biblesMap.keySet()) {
+			if (bookForNavigation != null) {
+				Bible bible = bookVersionsMap
+						.get(Utilities.generateKeyforBookVersionsMap(bookForNavigation.getThreeLetterCode(), version));
+				if (bible != null) {
+					run = paragraph.createRun();
+					run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.SUB_TITLE_3_FONT));
+					run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.SUB_TITLE_3_FONT_SIZE));
+					run.setText(counter++ + ". " + Utilities.getLanguageName(biblesMap.get(version).getLanguageCode())
+							+ " - " + Utilities.removePlus(biblesMap.get(version).getAbbr()) + " - "
+							+ biblesMap.get(version).getCommonName());
+					run.addBreak();
+				}
+			} else {
+				run = paragraph.createRun();
+				run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.SUB_TITLE_3_FONT));
+				run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.SUB_TITLE_3_FONT_SIZE));
+				run.setText(counter++ + ". " + Utilities.getLanguageName(biblesMap.get(version).getLanguageCode())
+						+ " - " + Utilities.removePlus(biblesMap.get(version).getAbbr()) + " - "
+						+ biblesMap.get(version).getCommonName());
+				run.addBreak();
+			}
+		}
+
+		run.addBreak();
+		run.addBreak();
+		run.addBreak();
+
+		if (!ParallelBibleCreator.skipCreatorDetails) {
+			paragraph = document.createParagraph();
+			paragraph.setAlignment(ParagraphAlignment.CENTER);
+			run = paragraph.createRun();
+			run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.SUB_TITLE_3_FONT));
+			run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.SUB_TITLE_3_FONT_SIZE));
+			run.addBreak();
+			run.addBreak();
+			run.addBreak();
+			run.addBreak();
+			run.setText(languageEnglish.getString(BibleToDocLanguage.STR_CREATED_BY_LABEL));
+			paragraph = document.createParagraph();
+			paragraph.setAlignment(ParagraphAlignment.CENTER);
+			run = paragraph.createRun();
+			run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.SUB_TITLE_4_FONT));
+			run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.SUB_TITLE_4_FONT_SIZE));
+			run.setText(languageEnglish.getString(BibleToDocLanguage.STR_CREATED_BY_DETAILS));
+		}
 
 		run.addBreak(BreakType.PAGE);
 		System.out.println("Title Page Creation completed");
@@ -415,6 +433,7 @@ public class WordDoc extends BiblesMap {
 		run.setText(languageEnglish.getString(BibleToDocLanguage.STR_PDF_INDEX_ISSUE));
 
 		addSectionBreak(document, 1, false);
+		System.out.println("PDF Issue Page Completed.");
 	}
 
 	private static void createIndex(XWPFDocument document) throws Exception {
@@ -516,20 +535,22 @@ public class WordDoc extends BiblesMap {
 		XWPFRun run = null;
 
 		paragraph = document.createParagraph();
-		paragraph.setAlignment(ParagraphAlignment.LEFT);
-		run = paragraph.createRun();
-		run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
-		run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
-		run.setText("WOG BOOKS XXXXX");
-		run.setBold(true);
-		run.addBreak();
+		paragraph.setAlignment(ParagraphAlignment.BOTH);
+		if (!ParallelBibleCreator.skipCreatorDetails) {
+			run = paragraph.createRun();
+			run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
+			run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
+			run.setText("WOG BOOKS XXXXX");
+			run.setBold(true);
+			run.addBreak();
 
-		run = paragraph.createRun();
-		run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
-		run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
-		run.setText("First Edition 2024");
-		run.addBreak();
-		run.addBreak();
+			run = paragraph.createRun();
+			run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
+			run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
+			run.setText("First Edition 2024");
+			run.addBreak();
+			run.addBreak();
+		}
 
 		CTBookmark bookmark = null;
 		for (String version : biblesMap.keySet()) {
@@ -627,76 +648,78 @@ public class WordDoc extends BiblesMap {
 
 		}
 
-		// Created By
-		run = paragraph.createRun();
-		run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
-		run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
-		run.setBold(true);
-		run.setText(BibleToDocLanguage.STR_CREATED_BY_LABEL);
-		run.addCarriageReturn();
-		run = paragraph.createRun();
-		run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
-		run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
-		run.setText(BibleToDocLanguage.STR_CREATED_BY_DETAILS);
-		run.addBreak();
-		run.addBreak();
+		if (!ParallelBibleCreator.skipCreatorDetails) {
+			// Created By
+			run = paragraph.createRun();
+			run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
+			run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
+			run.setBold(true);
+			run.setText(BibleToDocLanguage.STR_CREATED_BY_LABEL);
+			run.addCarriageReturn();
+			run = paragraph.createRun();
+			run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
+			run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
+			run.setText(BibleToDocLanguage.STR_CREATED_BY_DETAILS);
+			run.addBreak();
+			run.addBreak();
 
-		run = paragraph.createRun();
-		run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
-		run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
-		run.setBold(true);
-		run.setText(BibleToDocLanguage.STR_DOWNLOAD);
-		run.addCarriageReturn();
-		run = paragraph.createRun();
-		createExternalLinks(paragraph, BibleToDocLanguage.STR_DOWNLOAD_LINK1_TEXT,
-				BibleToDocLanguage.STR_DOWNLOAD_LINK1__URL);
-		run = paragraph.createRun();
-		run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
-		run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
-		run.setText(" and ");
-		createExternalLinks(paragraph, BibleToDocLanguage.STR_DOWNLOAD_LINK2_TEXT,
-				BibleToDocLanguage.STR_DOWNLOAD_LINK2__URL);
-		run = paragraph.createRun();
-		run.addBreak();
-		run.addBreak();
+			run = paragraph.createRun();
+			run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
+			run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
+			run.setBold(true);
+			run.setText(BibleToDocLanguage.STR_DOWNLOAD);
+			run.addCarriageReturn();
+			run = paragraph.createRun();
+			createExternalLinks(paragraph, BibleToDocLanguage.STR_DOWNLOAD_LINK1_TEXT,
+					BibleToDocLanguage.STR_DOWNLOAD_LINK1__URL);
+			run = paragraph.createRun();
+			run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
+			run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
+			run.setText(" and ");
+			createExternalLinks(paragraph, BibleToDocLanguage.STR_DOWNLOAD_LINK2_TEXT,
+					BibleToDocLanguage.STR_DOWNLOAD_LINK2__URL);
+			run = paragraph.createRun();
+			run.addBreak();
+			run.addBreak();
 
-		run = paragraph.createRun();
-		run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
-		run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
-		run.setBold(true);
-		run.setText(BibleToDocLanguage.STR_CONTACT_US);
-		run.addCarriageReturn();
-		run = paragraph.createRun();
-		run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
-		run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
-		run.setText(BibleToDocLanguage.STR_CONTACT_US_EMAIL);
-		run.addCarriageReturn();
-		run = paragraph.createRun();
-		run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
-		run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
-		run.setText(BibleToDocLanguage.STR_CONTACT_US_MOBILE);
-		run.addBreak();
-		run.addBreak();
+			run = paragraph.createRun();
+			run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
+			run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
+			run.setBold(true);
+			run.setText(BibleToDocLanguage.STR_CONTACT_US);
+			run.addCarriageReturn();
+			run = paragraph.createRun();
+			run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
+			run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
+			run.setText(BibleToDocLanguage.STR_CONTACT_US_EMAIL);
+			run.addCarriageReturn();
+			run = paragraph.createRun();
+			run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
+			run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
+			run.setText(BibleToDocLanguage.STR_CONTACT_US_MOBILE);
+			run.addBreak();
+			run.addBreak();
 
-		run = paragraph.createRun();
-		run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
-		run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
-		run.setBold(true);
-		run.setText(BibleToDocLanguage.STR_FOLLOW_US);
-		run.addCarriageReturn();
-		run = paragraph.createRun();
-		run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
-		run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
-		run.setText(BibleToDocLanguage.STR_YOUTUBE);
-		createExternalLinks(paragraph, BibleToDocLanguage.STR_YOUTUBE_TEXT, BibleToDocLanguage.STR_YOUTUBE_URL);
-		run = paragraph.createRun();
-		run.addCarriageReturn();
-		run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
-		run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
-		run.setText(BibleToDocLanguage.STR_FACEBOOK);
-		createExternalLinks(paragraph, BibleToDocLanguage.STR_FACEBOOK_TEXT, BibleToDocLanguage.STR_FACEBOOK_URL);
-
+			run = paragraph.createRun();
+			run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
+			run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
+			run.setBold(true);
+			run.setText(BibleToDocLanguage.STR_FOLLOW_US);
+			run.addCarriageReturn();
+			run = paragraph.createRun();
+			run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
+			run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
+			run.setText(BibleToDocLanguage.STR_YOUTUBE);
+			createExternalLinks(paragraph, BibleToDocLanguage.STR_YOUTUBE_TEXT, BibleToDocLanguage.STR_YOUTUBE_URL);
+			run = paragraph.createRun();
+			run.addCarriageReturn();
+			run.setFontFamily(language.getString(BibleToDocLanguage.BOOK_DETAILS_FONT));
+			run.setFontSize(language.getInt(BibleToDocLanguage.BOOK_DETAILS_FONT_SIZE));
+			run.setText(BibleToDocLanguage.STR_FACEBOOK);
+			createExternalLinks(paragraph, BibleToDocLanguage.STR_FACEBOOK_TEXT, BibleToDocLanguage.STR_FACEBOOK_URL);
+		}
 		addSectionBreak(document, 1, false);
+		System.out.println("Book Details Page Completed.");
 	}
 
 	private static void createExternalLinks(XWPFParagraph paragraph, String linkText, String linkURL) {
@@ -746,15 +769,15 @@ public class WordDoc extends BiblesMap {
 
 	private static void createContent(XWPFDocument document) {
 		System.out.println("Content Creation Started...");
-		int counter = 0;
+		int counter = 1;
 		for (Book bookForNavigation : bibleForNavigation.getBooks()) {
-			if (LIMIT_OUTPUT && counter++ > 2) {
+			if (LIMIT_OUTPUT && counter > 2) {
 				return;
 			}
 			if (NEW_TESTAMENT_ONLY && bookForNavigation.getBookNo() < 40) {
 				continue;
 			}
-			createBook(document, bookForNavigation, counter);
+			createBook(document, bookForNavigation, counter++);
 		}
 
 		System.out.println("Content Creation Completed...");
@@ -763,6 +786,11 @@ public class WordDoc extends BiblesMap {
 	private static void createBook(XWPFDocument document, Book bookForNavigation, int counter) {
 		if (bookByBook) {
 			document = new XWPFDocument();
+			createPageSettings(document);
+			createMetaData(document);
+			createTitlePage(document, bookForNavigation);
+			createBookDetailsPage(document, languageEnglish);
+			createPDFIssuePage(document);
 		}
 		// Book Heading Page
 		XWPFParagraph paragraph = null;
@@ -839,6 +867,22 @@ public class WordDoc extends BiblesMap {
 			uniqueBookMarkCounter++;
 			for (Verse verseForNavigation : chapterForNavigation.getVerses()) {
 
+
+				paragraph = document.createParagraph();
+				paragraph.setAlignment(ParagraphAlignment.CENTER);
+				//paragraph.setSpacingAfter(0);
+				run = paragraph.createRun();
+				run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.CHAPTER_HEADING_FONT));
+				run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.CHAPTER_HEADING_FONT_SIZE));
+				run.setBold(true);
+				run.setText(ParallelBibleCreator.verseString + " "+ verseForNavigation.getNumber());
+
+				bookmark = paragraph.getCTP().addNewBookmarkStart();
+				bookmark.setName(bookForNavigation.getLongName().replaceAll(" ", "_") + "_"
+						+ chapterForNavigation.getChapter() + "_" + verseForNavigation.getNumber());
+				bookmark.setId(BigInteger.valueOf(uniqueBookMarkCounter));
+				paragraph.getCTP().addNewBookmarkEnd().setId(BigInteger.valueOf(uniqueBookMarkCounter));
+				
 				// create table
 				XWPFTable table = document.createTable();
 				table.setCellMargins(0, 72, 0, 72); // set margins here
@@ -852,33 +896,31 @@ public class WordDoc extends BiblesMap {
 				tableRow.addNewTableCell();
 				tableRow.addNewTableCell();
 
-				cell = tableRow.getCell(0);
-				paragraph = cell.getParagraphArray(0);
-				paragraph.setSpacingAfter(0);
-				run = paragraph.createRun();
-				run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.VERSE_FONT));
-				run.setFontSize(languageEnglish.getInt(BibleToDocLanguage.VERSE_FONT_SIZE));
-				run.setBold(true);
-				run.setText(verseForNavigation.getNumber() + ". ");
-
-				bookmark = paragraph.getCTP().addNewBookmarkStart();
-				bookmark.setName(bookForNavigation.getLongName().replaceAll(" ", "_") + "_"
-						+ chapterForNavigation.getChapter() + "_" + verseForNavigation.getNumber());
-				bookmark.setId(BigInteger.valueOf(uniqueBookMarkCounter));
-				paragraph.getCTP().addNewBookmarkEnd().setId(BigInteger.valueOf(uniqueBookMarkCounter));
+				//cell = tableRow.getCell(0);
 
 				boolean firstRowisDone = false;
 				for (String version : biblesMap.keySet()) {
-					if (!firstRowisDone) {
-						firstRowisDone = true;
-					} else {
-						tableRow = table.createRow();
-					}
 					Verse verse = versesMap
 							.get(Utilities.generateKeyforVerseMap(version, bookForNavigation.getThreeLetterCode(),
 									chapterForNavigation.getChapter(), verseForNavigation.getNumber()));
 					if (verse != null) {
-						String verseText = Utilities.removeHTMLTags(verse.getUnParsedText());
+						// System.out.println(Utilities.getVerseDetails(bookForNavigation,
+						// chapterForNavigation,
+						// verseForNavigation, version, verse));
+						if (!firstRowisDone) {
+							firstRowisDone = true;
+						} else {
+							tableRow = table.createRow();
+						}
+						String verseText = null;
+						try {
+							verseText = Utilities.removeHTMLTags(verse.getUnParsedText());
+						} catch (StringIndexOutOfBoundsException e) {
+							System.out.println("Error in removeHTMLTags for the verse: " + Utilities.getVerseDetails(
+									bookForNavigation, chapterForNavigation, verseForNavigation, version, verse));
+							e.printStackTrace();
+							System.exit(0);
+						}
 
 						cell = tableRow.getCell(1);
 						cell.setVerticalAlignment(XWPFVertAlign.CENTER);
@@ -891,10 +933,6 @@ public class WordDoc extends BiblesMap {
 						run = paragraph.createRun();
 
 						if (INCLUDE_VERSION_LABEL) {
-							// run.setFontFamily(languageEnglish.getString(BibleToDocLanguage.VERSE_FONT));
-							// run.setFontSize(
-							// languageEnglish.getInt(BibleToDocLanguage.STR_PARALLEL_BIBLE_SHORT_NAME_FONT_SIZE));
-							// run.setText(version + " ");
 
 							createAnchorLink(paragraph, version + "  ",
 									biblesMap.get(version).getAbbr().replaceAll(" ", "_"), false, "    ",
@@ -907,6 +945,7 @@ public class WordDoc extends BiblesMap {
 						paragraph = cell.getParagraphArray(0);
 						paragraph.setSpacingBefore(0);
 						paragraph.setSpacingAfter(0);
+						paragraph.setAlignment(ParagraphAlignment.BOTH);
 						// if ("iw".equalsIgnoreCase(biblesMap.get(version).getLanguageCode())) {
 						// paragraph.setAlignment(ParagraphAlignment.RIGHT);
 						// }
