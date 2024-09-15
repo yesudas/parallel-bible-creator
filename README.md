@@ -20,7 +20,7 @@ on the command line for usage information.
 3. Syntax to run this program:
 
 ~~~
-java -jar parallel-bible-creator.jar [path to INFORMATION.ini file]
+java -jar parallel-bible-creator.jar -Xmx4096m [path to INFORMATION.ini file]
 ~~~
 
 # INFORMATION.ini is mandatory
@@ -49,6 +49,9 @@ Or INFORMATION.ini file can be prepared with the below tips:
 - wordDocumentPageSize=> Optional, Supported values are Letter, Tabloid, Ledger, Legal, Statement, Executive, A0, A1, A2, A3, A4, A5, B4, B5, Folio, Quarto, 10x14 
 - wordDocumentPageOrientation => Optional, Supported values are PORTRAIT, LANDSCAPE
 - wordDocumentPageMargin => Optional, Give any number or decimal values in inches. Ex. 0.45
+- skipCreatorDetails => Optional, supported values are yes, no
+- verseString => Optional=you can give label in your preferred language like Verse, வசனம், etc
+- Other configurations, all these strings, font configurations are used in generating the parallel bibles
 
 # Supported formats:
 1. TextFiles
