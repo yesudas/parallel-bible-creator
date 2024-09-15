@@ -175,7 +175,9 @@ public class ParallelBibleCreator {
 		System.out.println(
 				"wordDocumentPageSize=> Optional, Supported values are Letter, Tabloid, Ledger, Legal, Statement, Executive, A0, A1, A2, A3, A4, A5, B4, B5, Folio, Quarto, 10x14");
 		System.out.println("wordDocumentPageOrientation => Optional, Supported values are PORTRAIT, LANDSCAPE");
-		System.out.println("wordDocumentPageMargin => Optional, Give any number or decimal values in inches. Ex. 0.45");
+		System.out.println("skipCreatorDetails => Optional, supported values are yes=no");
+		System.out.println("verseString => Optional=you can give label in your preferred language like Verse=வசனம்=etc");
+		System.out.println("Other configurations, all these strings, font configurations are used in generating the parallel bibles");
 		System.out.println(
 				"bibleSourcePath => give the full directory path where the bible text & corresponding *-information.ini files are stored");
 		System.out.println("Use \\\\ or / in instead of just single \\ in the file path");

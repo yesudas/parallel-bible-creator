@@ -18,6 +18,8 @@ import in.wordofgod.bible.parser.vosgson.Verse;
  */
 public class Utilities {
 
+	public static ParallelBibleToDocLanguageEnglish languageEnglish = new ParallelBibleToDocLanguageEnglish();
+
 	public static String generateKeyforBooksMap(String version, String threeLetterCode) {
 		return version + "-" + threeLetterCode;
 	}
@@ -181,6 +183,28 @@ public class Utilities {
 			}
 		}
 		return verseText;
+	}
+
+	public static String getString(String key) {
+		String value = ParallelBibleCreator.INFORMATION.getProperty(key);
+		if (value != null) {
+			return value;
+		} else {
+			return languageEnglish.getString(key);
+		}
+	}
+
+	public static Integer getInt(String key) {
+		String value = ParallelBibleCreator.INFORMATION.getProperty(key);
+		if (value != null) {
+			try {
+				return Integer.parseInt(value);
+			} catch (Exception e) {
+				return Integer.parseInt(languageEnglish.getString(key));
+			}
+		} else {
+			return Integer.parseInt(languageEnglish.getString(key));
+		}
 	}
 
 }

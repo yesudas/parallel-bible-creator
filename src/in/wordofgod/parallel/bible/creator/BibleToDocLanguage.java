@@ -75,20 +75,8 @@ public interface BibleToDocLanguage {
 	public static String STR_TRANSLATED_BY_LABEL = "Translated By: ";
 	public static String STR_PUBLISHED_BY_LABEL = "Published By: ";
 
-	public static String STR_COMMON_NAME = "common.name";
-	public static String STR_SHORT_NAME = "short.name";
-	public static String STR_LONG_NAME = "long.name";
-	public static String STR_LONG_NAME_ENGLISH = "long.name.english";
-	public static String STR_TRANSLATED_BY = "translated.by";
-	public static String STR_PUBLISHED_BY = "published.by";
-	public static String STR_COPYRIGHT = "copyright";
-	public static String STR_COPYRIGHT_DETAILS = "copyright.details";
-	public static String STR_TOTAL_BOOKS = "total.books";
-	public static String STR_TOTAL_CHAPTERS = "total.chapters";
-	public static String STR_TOTAL_VERSES = "total.verses";
-	public static String STR_TOTAL_WORDS = "total.words";
-	public static String STR_TOTAL_UNIQUE_WORDS = "total.unique.words";
-	public static String STR_WOG_BOOK_NO = "wog.book.no";
+	public static String STR_COMMON_NAME = "STR_COMMON_NAME";
+	public static String STR_COPYRIGHT_DETAILS = "STR_COPYRIGHT_DETAILS";
 
 	public static String STR_AND = "STR_AND";
 	public static String SUB_COMMON_NAME_FONT = "SUB_COMMON_NAME_FONT";
